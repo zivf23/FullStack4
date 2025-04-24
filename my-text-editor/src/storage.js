@@ -11,7 +11,7 @@ export function getUserNamespace(user) {
   
   // ===== src/components/FileManager.jsx =====
   import React, { useState } from "react";
-  import { useAuth } from "../contexts/AuthContext";
+  import { useAuth } from "./contexts/AuthContext";
   import { listFiles, saveFile, loadFile } from "../storage";
   
   export default function FileManager({ text, setText, filename, setFilename }) {
