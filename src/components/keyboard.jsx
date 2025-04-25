@@ -64,6 +64,7 @@ const Keyboard = ({ onKeyPress, onBackPress, onArrowPress}) => {
           />
         ))}
         <Key
+          // need ctrl + shift keys
           key="backspace"
           char="⌫" // לבדוק מה הקיצור דרך לסימון של מחק
           onClick={onBackPress}
