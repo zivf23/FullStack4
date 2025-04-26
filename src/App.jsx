@@ -228,8 +228,12 @@ export default function App() {
       <Editor styleTest={getTextWithCursor()}></Editor>
       <div className="keyboard">
         <Keyboard
-          ......={insertCharacter} // for example, Need to finish the keyboard
-        ></Keyboard>
+          keyPressed = {insertCharacter} // for example, Need to finish the keyboard
+          backPressd = {deleteCharacter}
+          arrowPressed = {moveCursorPosition}
+          selecting = {selection}
+          setSelection = {setSelection}
+        />
       </div>
     </div>
   );

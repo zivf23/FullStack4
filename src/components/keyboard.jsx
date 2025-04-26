@@ -1,37 +1,11 @@
 import React, { useState } from "react";
 import Key from "./singleKey"; 
+import { layouts } from "./KeyboardLanguages"
+import "../App.css";
 
-const layouts = {
-    // I'll make 4 diferent kind of keyboards and I'll switch between them insted of making one complex one
-    // because I want the munbers to apper in every lenguage keyboard I'll repeate them in every one that way it will be simplier/
-  upEnglish: {
-    number: ['1','2','3','4','5','6','7','8','9','0'],
-    letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-    specialKeys: ['\n', ' '],
-    special: { '\n': 'enter', ' ': 'space' }, // in order to make a new row we'll use the word "enter" and fot space, space.
-  },
-  lowEnglish: {
-    number: ['1','2','3','4','5','6','7','8','9','0'],
-    letters: 'abcdefghijklmnopqrstuvwxyz'.split(''),
-    specialKeys: ['\n', ' '],
-    special: { '\n': 'enter', ' ': 'space' },
-  },
-  hebrew: {
-    number: ['1','2','3','4','5','6','7','8','9','0'],
-    letters: 'אבגדהוזחטיכלמנסעפצקרשת'.split(''),
-    specialKeys: ['\n', ' '],
-    special: { '\n': 'רד שורה', ' ': 'רווח' },
-  },
-  emojies: {
-    letters: ['😂', '❤️', '👍', '😎'], // to add emojies(thanks to GTP for easy copy-paste of emojies easyily)
-    specialKeys: ['\n', ' '],
-    special: { '\n': 'enter', ' ': 'space' },
-  }
-};
-
-const Keyboard = ({ onKeyPress, onBackPress, onArrowPress}) => {
-  const [language, setLanguage] = useState("upEnglish");
-  const languageOrder = ["upEnglish", "lowEnglish", "hebrew", "emojies"];
+export default function Keyboard ({ keyPressd, backPressd, arrowPressd}) {
+  const [language, setLanguage] = useState("lowEnglish");
+  const languageOrder = ["lowEnglish", "upEnglish", "hebrew", "emojies"];
 
   // switch between languages in the order above
   const switchLanguage = () => {
@@ -40,48 +14,66 @@ const Keyboard = ({ onKeyPress, onBackPress, onArrowPress}) => {
     setLanguage(languageOrder[nextIndex]);
   };
 
-  const { number, letters, special } = layouts[language];
+  const layout = layouts[language];
+  const rows = [
+    layout.numbers,
+    layout.letters1,
+    layout.letters2,
+    layout.letters3,
+  ];
+  const special = layout.special;
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <button onClick={switchLanguage}>Switch Language ({language.toUpperCase()})</button>
+    <div className="keyboard-conteiner">
+      <div className="keyboard-layout">
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          maxWidth: "600px",
-          marginTop: "10px",
-          justifyContent: "center"
-        }}
-      >
-        {[...number, ...letters, '\n', ' '].map((key, index) => (
-          <Key
-            key={index}
-            char={key}
-            onClick={onKeyPress}
-            altText={special[key] || ""}
-          />
-        ))}
-        <Key
-          // need ctrl + shift keys
-          key="backspace"
-          char="⌫" // לבדוק מה הקיצור דרך לסימון של מחק
-          onClick={onBackPress}
-          altText="" />
-          <Key
-          key="left"
-          char="⬅"
-          onClick={onArrowPress} // לבוסיף פה ולמטה סימונים של חצים ימינה ושמאלה, שוב תודה לג'יפי
-          altText="<<<<<<<<<<<<" /> 
-          <Key
-          key="right"
-          char="➡"
-          onClick={onArrowPress}
-          altText=">>>>>>>>>>>>" /> 
+        {/* first row */}
+        <div className="row">
+          {layout.numbers.map((key, i) => (
+            <Key key={i} char={key} onClick={keyPressd} />
+          ))}
+          <Key char="delete" altText={special.delete} onClick={backPressd} />
+        </div>
+
+
+        {/* second row */}
+        <div className="row">
+          {layout.letters1.map((key, i) => (
+            <Key key={i} char={key} onClick={keyPressd} />
+          ))}
+          <Key char="language"  altText={special.language} onClick={switchLanguage()} />
+        </div>
+
+
+        {/* third row */}
+        <div className="row">
+          {layout.letters2.map((key, i) => (
+            <Key key={i} char={key} onClick={keyPressd} />
+          ))}
+          <Key char="enter" altText={special.enter} wide onClick={() => keyPressd("\n")} />
+        </div>
+
+        {/* fourth row */}
+        <div className="row">
+          <Key char="shift" altText={special.shift} wide onClick={() => {}} />
+          {layout.letters3.map((key, i) => (
+            <Key key={i} char={key} onClick={keyPressd} />
+          ))}
+          <Key char="shift" altText={special.shift} wide onClick={() => {}} />
+        </div>
+
+        {/* fifth row */}
+        <div className="row">
+          <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
+          <Key char="alt" altText={special.alt} onClick={() => {}} />
+          <Key char="space" altText={special.space} wide onClick={() => keyPressd(" ")} />
+          <Key char="alt" altText={special.alt} onClick={() => {}} />
+          <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
+          <Key char="left" altText={special.left} onClick={() => arrowPressd("left")} />
+          <Key char="right" altText={special.right} onClick={() => arrowPressd("right")} />
+        </div>
+
       </div>
     </div>
   );
 };
-
-export default Keyboard;
