@@ -1,7 +1,7 @@
 import Preview from "./components/Preview";	
 import Editor from "./components/Editor";
 import FileManager from "./components/FileManager";	
-import Keyboard from "./components/Keyboard";	
+// import Keyboard from "./components/Keyboard";	
 import React, { useState} from "react";
 // import FileManager from "./components/FileManager";
 import Login from "./components/Login";
@@ -37,7 +37,7 @@ function Shell() {
  export default function App() {
   return (
     <AuthProvider>
-\      <RichEditorScreen />
+      <RichEditorScreen />
     </AuthProvider>
   );
 } 

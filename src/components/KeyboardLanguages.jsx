@@ -26,7 +26,7 @@ export const layouts = {
 
     lowEnglish: {
         numbers: ['1','2','3','4','5','6','7','8','9','0'],
-        letters1: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', ''],
+        letters1: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         letters2: ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
         letters3: ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.'],
         specialKeys: ['right', 'left', 'delete', 'enter', 'space', 'ctrl', 'alt', 'shift', 'language'],
