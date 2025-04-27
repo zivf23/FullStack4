@@ -1,10 +1,26 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { listFiles, saveFile, loadFile } from "../storage";
+import { listFiles, saveFile, loadFile, deleteFile } from "../storage";
 
-export default function FileManager({ text, setText, filename, setFilename }) {
+export default function FileManager({ text, setText, fileMeta, setFilename }) {
+  /* fileMeta   = { name: "doc.txt", id: 123 } */
   const { user, logout } = useAuth();
   const [showList, setShowList] = useState(false);
+
+  /* ——— New ——— */
+  const handleNew = () => {
+    if (text.length && !window.confirm("Discard current text?")) return;
+    setText("");
+    setFileMeta({ name: null, id: null });
+    setShowList(false);
+  };
+
+  /* ——— Save / Save As ——— */
+  const doSave = (name) => {
+    if (!name) return;
+    saveFile(user, name, text);
+    setFileMeta({ name, id: Date.now() });
+  };
 
   const handleSave = () => {
     const name = filename || prompt("Enter file name:", filename || "untitled.txt");
@@ -34,10 +50,14 @@ export default function FileManager({ text, setText, filename, setFilename }) {
     }
   };
 
+  /* ——— Open ——— */
   const handleOpen = (name) => {
     const fileContent = loadFile(user, name);
     setText(fileContent);
     setFilename(name);
+    const content = loadFile(user, name);
+    setText(content);
+    setFilename({ name, id: Date.now() });
     setShowList(false);
   };
 
@@ -57,11 +77,13 @@ export default function FileManager({ text, setText, filename, setFilename }) {
 
   return (
     <div className="flex gap-2 items-center">
-      <button className="btn" onClick={handleNew}>📄 New</button>
+      <button className="btn" onClick={handleNew}>📝 New</button>
       <button className="btn" onClick={handleSave}>💾 Save</button>
       <button className="btn" onClick={handleSaveAs}>📁 Save As</button>
       <button className="btn" onClick={() => setShowList(v => !v)}>📂 Open…</button>
-      <span className="ml-auto italic text-sm">{filename || "Unnamed"}</span>
+      <span className="ml-auto italic text-sm">
+        {fileMeta.name || "Unnamed"}
+      </span>
       <button className="btn bg-red-600" onClick={logout}>Logout</button>
 
       {showList && (
@@ -81,9 +103,8 @@ export default function FileManager({ text, setText, filename, setFilename }) {
                   </button>
                 </li>
               ))}
-              {listFiles(user).length === 0 && (
-                <li className="text-gray-500">No files yet</li>
-              )}
+              {listFiles(user).length === 0 &&
+                <li className="text-gray-500">No files yet</li>}
             </ul>
           </div>
         </div>

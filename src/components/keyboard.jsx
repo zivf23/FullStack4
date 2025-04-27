@@ -30,7 +30,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed, delet
         {/* first row */}
         <div className="row">
           {layout.numbers.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="delete" altText={special.delete} onClick={backPressed} />
           <Key char="clear" altText="Clear All" wide onClick={clearAll} />
@@ -40,7 +40,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed, delet
         {/* second row */}
         <div className="row">
           {layout.letters1.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="language"  altText={special.language} onClick={switchLanguage} />
           <Key char="deleteWord" altText="Delete Word" wide onClick={deleteWord} />
@@ -50,7 +50,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed, delet
         {/* third row */}
         <div className="row">
           {layout.letters2.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="enter" altText={special.enter} wide onClick={() => keyPressed("\n")} />
         </div>
@@ -59,7 +59,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed, delet
         <div className="row">
           <Key char="shift" altText={special.shift} wide onClick={() => {}} />
           {layout.letters3.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="select" altText="select" wide onClick={toggleSelection} />
         </div>
@@ -68,7 +68,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed, delet
         <div className="row">
           <Key char="ctrl" altText={special.ctrl} wide onClick={() => {}} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
-          <Key char="space" altText={special.space} wide onClick={() => keyPressed(" ")} />
+          <Key char="space" altText={"space"} wide onClick={() => keyPressed(" ")} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
           <Key char="ctrl" altText={special.ctrl} wide onClick={() => {}} />
           <Key char="left" altText={special.left} onClick={() => arrowPressed("left")} />

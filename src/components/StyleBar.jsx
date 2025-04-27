@@ -34,17 +34,16 @@ const StyleBar = ({ currentStyle, onStyleChange, toggleStyle }) => {
   ];
 
   const colorOptions = [
-    { name: 'Black', value: 'black' },
-    { name: 'Red', value: 'red' },
-    { name: 'Blue', value: 'blue' },
-    { name: 'Green', value: 'green' },
-    { name: 'Yellow', value: 'gold' },
-    { name: 'Purple', value: 'purple' },
-    { name: 'Orange', value: 'orange' },
-    { name: 'Pink', value: 'pink' },
-    { name: 'Gray', value: 'gray' }
-  ];
-
+        { name: 'Black',  value: '#000000' },
+        { name: 'Red',    value: '#ff0000' },
+        { name: 'Blue',   value: '#0000ff' },
+        { name: 'Green',  value: '#00aa00' },
+        { name: 'Yellow', value: '#ffff00' },
+        { name: 'Purple', value: '#800080' },
+        { name: 'Orange', value: '#ff7f00' },
+        { name: 'Pink',   value: '#ff69b4' },
+        { name: 'Gray',   value: '#808080' }
+    ];
   return (
     <div className="style-bar">
       {/* Font */}

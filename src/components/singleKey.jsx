@@ -23,7 +23,7 @@ const KeyButton = ({ char, onClick, altText, wide }) => {
         width: wide ? "auto" : "40px",
         minWidth: wide ? "100px" : "40px",
       }}
-      title={altText}
+      title={altText || char}
     >
       {altText || char}
     </button>

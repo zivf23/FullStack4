@@ -2,6 +2,7 @@ import React from "react";
 import { isRTL } from "./testSide"; // ראה הערות שם לצורך
 import CustomLetter from "./CustomChar";
 
+
 const Editor = ({ text = [] }) => {
   if (!text || text.length === 0) {
     return <div className="editor-container"></div>
