@@ -37,6 +37,7 @@ const Editor = ({ text = [] }) => {
 
         return (
           <div 
+          
             key = {`line-${lineIndex}`}
             className = "text-line"
             style = {{

@@ -1,8 +1,7 @@
 import React, { useState, useCallback } from "react";
-import Editor   from "./components/Editor";
-import Preview  from "./components/Preview";
-import FileManager from "./components/FileManager";
-import Keyboard from "./components/Keyboard";
+import Preview  from "./Preview";
+import FileManager from "./FileManager";
+import Keyboard from "./Keyboard";
 import Editor from "./Editor";	
 /* ---------- Component ---------- */
 export default function RichEditorScreen() {
