@@ -3,7 +3,7 @@ import Key from "./singleKey";
 import { layouts } from "./KeyboardLanguages"
 import "../App.css";
 
-export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
+export default function Keyboard ({ keyPressed, backPressed, arrowPressed, deleteWord, clearAll, toggleSelection }) {
   const [language, setLanguage] = useState("lowEnglish");
   const languageOrder = ["lowEnglish", "upEnglish", "hebrew", "emojies"];
 
@@ -33,6 +33,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
             <Key key={i} char={key} onClick={keyPressed} />
           ))}
           <Key char="delete" altText={special.delete} onClick={backPressed} />
+          <Key char="clear" altText="Clear All" wide onClick={clearAll} />
         </div>
 
 
@@ -42,6 +43,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
             <Key key={i} char={key} onClick={keyPressed} />
           ))}
           <Key char="language"  altText={special.language} onClick={switchLanguage} />
+          <Key char="deleteWord" altText="Delete Word" wide onClick={deleteWord} />
         </div>
 
 
@@ -59,16 +61,16 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
           {layout.letters3.map((key, i) => (
             <Key key={i} char={key} onClick={keyPressed} />
           ))}
-          <Key char="shift" altText={special.shift} wide onClick={() => {}} />
+          <Key char="select" altText="select" wide onClick={toggleSelection} />
         </div>
 
         {/* fifth row */}
         <div className="row">
-          <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
+          <Key char="ctrl" altText={special.ctrl} wide onClick={() => {}} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
           <Key char="space" altText={special.space} wide onClick={() => keyPressed(" ")} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
-          <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
+          <Key char="ctrl" altText={special.ctrl} wide onClick={() => {}} />
           <Key char="left" altText={special.left} onClick={() => arrowPressed("left")} />
           <Key char="right" altText={special.right} onClick={() => arrowPressed("right")} />
         </div>

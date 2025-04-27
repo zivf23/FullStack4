@@ -21,5 +21,17 @@ export function saveFile(user, name, content) {
 }
 
 export function loadFile(user, name) {
-  return getUserNamespace(user)[user][name] || "";
+  return userData[user] && userData[user][name] ? userData[user][name] : "";
+}
+
+export function deleteFile(user, name) {
+  const userData = getUserNamespace(user);
+
+  if (store[user] && store[user][name]) {
+    delete store[user][name];
+    saveUserNamespace(store);
+    return true;
+  }
+
+  return false;
 }

@@ -1,18 +1,18 @@
-import Preview from "./components/Preview";	
-import Editor from "./components/Editor";
-import FileManager from "./components/FileManager";	
+// import Preview from "./components/Preview";	
+// import Editor from "./components/Editor";
+// import FileManager from "./components/FileManager";	
 // import Keyboard from "./components/Keyboard";	
-import React, { useState} from "react";
+import React from "react";
 // import FileManager from "./components/FileManager";
-import Login from "./components/Login";
-import {useAuth, AuthProvider  } from "./contexts/AuthContext";
+// import Login from "./components/Login";
+import { AuthProvider  } from "./contexts/AuthContext";
 import "./index.css";
 import "./App.css";
 import RichEditorScreen from "./components/RichEditorScreen";
 
 
-
-function Shell() {
+// אין שימוש ב-"של" אז שמתי את זה בהערה
+/* function Shell() {
   const { user } = useAuth();
   const [text, setText] = useState("");
   const [filename, setFilename] = useState(null);
@@ -31,7 +31,7 @@ function Shell() {
       </div>
     </div>
   );
-}
+} */
 
 
  export default function App() {

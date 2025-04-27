@@ -112,6 +112,13 @@ const StyleBar = ({ currentStyle, onStyleChange, toggleStyle }) => {
           <strong>B</strong>
         </button>
 
+        <button
+          className={`style-button ${currentStyle.italic ? 'active' : ''}`}
+          onClick={() => toggleStyle('italic')}
+          title="Italic"
+        >
+          <i>I</i>
+        </button>
 
         <button
           className={`style-button ${currentStyle.underline ? 'active' : ''}`}

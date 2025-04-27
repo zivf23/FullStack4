@@ -6,14 +6,18 @@
 import React from "react";
 
 const CustomLetter = ({ charObj }) => {
-  const { char, font, size, color } = charObj;
+  const { char, font, size, color, bold, italic, underline, highlight } = charObj;
 
   return (
     <span
       style={{
-        font: font,
-        fontSize: size,
-        color: color,
+        font: font || 'Arial',
+        fontSize: size || '16px',
+        color: color || 'black',
+        fontWeight: bold ? 'bold' : 'normal',
+        fontStyle: italic ? 'italic' : 'normal',
+        textDecoration: underline ? 'underline' : 'none',
+        backgroundColor: highlight ? '#87CEFA' : 'transparent',
         display: "inline",
       }}
     >

@@ -1,6 +1,6 @@
 import React from "react";
 
-const KeyButton = ({ char, onClick, altText }) => {
+const KeyButton = ({ char, onClick, altText, wide }) => {
   const handleClick = () => {
     if (onClick) {
       onClick(char);
@@ -20,6 +20,8 @@ const KeyButton = ({ char, onClick, altText }) => {
         cursor: "pointer",
         backgroundColor: "#f4f4f4",
         transition: "background-color 0.2s",
+        width: wide ? "auto" : "40px",
+        minWidth: wide ? "100px" : "40px",
       }}
       title={altText}
     >

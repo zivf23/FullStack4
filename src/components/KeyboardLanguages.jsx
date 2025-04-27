@@ -63,12 +63,14 @@ export const layouts = {
     },
 
     emojies: {
-        numbers: [],
-        letters1: ['😂', '❤️', '👍', '😎'], // to add emojies (thanks to GTP for easy copy-paste of emojies easyily)
-        letters2: [],
-        letters3: [],
+        numbers: ['1','2','3','4','5','6','7','8','9','0'], // looks weird witout the first row
+        letters1: ['😂', '❤', '👍', '😎', '🔥', '✨', '🎉', '👏', '😊', '🙏'], // to add emojies (thanks to GTP for easy copy-paste of emojies easyily)
+        letters2: ['😁', '😍', '🤔', '😢', '😭', '😱', '🤩', '🥳', '😴', '🤗'],
+        letters3: ['👋', '🤝', '👌', '👀', '💪', '🙌', '👨‍💻', '🌈', '🍕', '🚀'],
         specialKeys: ['delete', 'enter', 'space', 'language'],
         special: {
+            'right': '➡',
+            'left': '⬅',
             'delete': '⌫',
             'enter': 'Enter',
             'space': ' ',

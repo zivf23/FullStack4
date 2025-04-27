@@ -33,7 +33,7 @@ const Editor = ({ text = [] }) => {
   return (
     <div className="editor-container">
       {lines.map((line, lineIndex) => {
-        const rtl = line.length > 0 && isRTL(text)
+        const rtl = line.length > 0 && line.some(char => isRTL(char.char));
 
         return (
           <div 
