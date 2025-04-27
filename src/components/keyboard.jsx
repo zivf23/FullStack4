@@ -30,7 +30,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
         {/* first row */}
         <div className="row">
           {layout.numbers.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="delete" altText={special.delete} onClick={backPressed} />
         </div>
@@ -39,7 +39,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
         {/* second row */}
         <div className="row">
           {layout.letters1.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="language"  altText={special.language} onClick={switchLanguage} />
         </div>
@@ -48,7 +48,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
         {/* third row */}
         <div className="row">
           {layout.letters2.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="enter" altText={special.enter} wide onClick={() => keyPressed("\n")} />
         </div>
@@ -57,7 +57,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
         <div className="row">
           <Key char="shift" altText={special.shift} wide onClick={() => {}} />
           {layout.letters3.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressed} />
+            <Key key={i} char={key} onClick={ch => keyPressed(String(ch))} />
           ))}
           <Key char="shift" altText={special.shift} wide onClick={() => {}} />
         </div>
@@ -66,11 +66,11 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
         <div className="row">
           <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
-          <Key char="space" altText={special.space} wide onClick={() => keyPressed(" ")} />
+          <Key char="space" altText={"space"} wide onClick={() => keyPressed(" ")} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
           <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
-          <Key char="left" altText={special.left} onClick={() => arrowPressed("left")} />
-          <Key char="right" altText={special.right} onClick={() => arrowPressed("right")} />
+          <Key char="left" altText={"←"} onClick={() => arrowPressed("left")} />
+          <Key char="right" altText={"→"} onClick={() => arrowPressed("right")} />
         </div>
 
       </div>

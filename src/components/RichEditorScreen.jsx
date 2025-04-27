@@ -1,149 +1,153 @@
 import React, { useState, useCallback } from "react";
-import Preview  from "./Preview";
+import Preview     from "./Preview";
 import FileManager from "./FileManager";
-import Keyboard from "./keyboard";
-import Editor from "./Editor";
-import StyleBar from "./StyleBar";
-/* ---------- Component ---------- */
-export default function RichEditorScreen() {
-  /* text – מערך אובייקטים {char, font, size, …} */
-  const [textContent, setTextContent] = useState([]);
+import Keyboard    from "./Keyboard";
+import Editor      from "./Editor";
+import StyleBar    from "./StyleBar";
 
-  /* cursor */
+/* ───────── קומפוננטה ───────── */
+export default function RichEditorScreen() {
+
+  /* 1️⃣  Tabs */
+  const [docs, setDocs] = useState([
+    { id: 1, title: "Untitled 1", content: [] }
+  ]);
+  const [activeId, setActiveId] = useState(1);
+  const activeDoc   = docs.find(d => d.id === activeId) || docs[0];
+  const textContent = Array.isArray(activeDoc.content) ? activeDoc.content : [];
+
+  /* 2️⃣  File-meta לטובת FileManager */
+  const [fileMeta, setFileMeta] = useState({ name: null, id: null });
+
+  /* 3️⃣  Cursor + Selection */
   const [cursor, setCursor] = useState({
     position: 0,
-    style: { font: "Arial", size: "20px", color: "black",
-             bold: false, italic: false }
+    style: { font:"Arial", size:"20px", color:"#000000", bold:false, italic:false }
   });
-
-  /* selection */
   const [selection, setSelection] = useState({
-    active: false,
-    startPosition: null,
-    endPosition: null,
+    active:false, startPosition:null, endPosition:null
   });
 
-  /* ───── Helpers ───── */
-  const getTextWithCursor = useCallback(() => {
-    if (textContent.length === 0) return [{ char: "|", ...cursor.style }];
+  /* — helper: שמירה בטאב הפעיל — */
+  const setTextContent = (arr) =>
+    setDocs(ds => ds.map(d =>
+      d.id === activeId ? { ...d, content: arr } : d
+    ));
 
+  /* — helper: array + cursor — */
+  const getTextWithCursor = useCallback(() => {
+    if (!textContent.length)
+      return [{ char:"|", ...cursor.style }];
     return [
       ...textContent.slice(0, cursor.position),
-      { char: "|", ...cursor.style },
+      { char:"|", ...cursor.style },
       ...textContent.slice(cursor.position)
     ];
   }, [textContent, cursor]);
 
-  /* Turning on and off style (bold, underline) */
-  const toggleStyle = useCallback((styleProperty) => {
-    setCursor(current => ({
-      ...current,
-      style: {
-        ...current.style,
-        [styleProperty]: !current.style[styleProperty]
-      }
-    }));
-  }, []);
+  /* 4️⃣  Style toggles */
+  const toggleStyle = (prop) =>
+    setCursor(c => ({ ...c, style:{ ...c.style, [prop]:!c.style[prop] }}));
 
-  const changeStyle = useCallback((propety, value) => {
-    setCursor(current => ({
-      ...current,
-      style: {
-        ...current.style,
-        [propety]: value
-      }
-    }));
+  const changeStyle = (prop, val) => {
+    setCursor(c => ({ ...c, style:{ ...c.style, [prop]:val }}));
+    /* החלה על סימון */
+    if (selection.active && selection.startPosition!==null) {
+      const s = Math.min(selection.startPosition,selection.endPosition);
+      const e = Math.max(selection.startPosition,selection.endPosition);
+      setTextContent(tc => tc.map((ch,i)=>
+        i>=s && i<e ? { ...ch, [prop]:val } : ch
+      ));
+    }
+  };
 
-    if (selection.active && selection.startPosition !== null && selection.endPosition !== null) {
-      const start = Math.min(selection.startPosition, selection.endPosition);
-      const end = Math.max(selection.startPosition, selection.endPosition);
-      
-      setTextContent(current => {
-        const newText = [...current];
-        for (let i = start; i < end; i++) {
-          if (i < newText.length) {
-            newText[i] = {
-              ...newText[i],
-              [property]: value
-            };
-          }
-        }
-        return newText;
-      });
-    } 
-  }, [selection]);
-
-  /* ───── Editing actions (insert / delete / move) ───── */
-  const insertCharacter = useCallback((char) => {
-    const newChar = { char, ...cursor.style };
-
+  const insertCharacter = (ch) => {
+    const newChar = { char: ch, ...cursor.style };
+  
     if (selection.active && selection.startPosition !== null) {
-      const start = Math.min(selection.startPosition, selection.endPosition);
-      const end   = Math.max(selection.startPosition, selection.endPosition);
-
-      setTextContent(cur => [
-        ...cur.slice(0, start), newChar, ...cur.slice(end)
-      ]);
-      setCursor(cur => ({ ...cur, position: start + 1 }));
-      setSelection({ active:false, startPosition:null, endPosition:null });
+      const s = Math.min(selection.startPosition, selection.endPosition);
+      const e = Math.max(selection.startPosition, selection.endPosition);
+      setTextContent(tc => [...tc.slice(0, s), newChar, ...tc.slice(e)]);
+      setCursor(c => ({ ...c, position: s + 1 }));
+      setSelection({ active: false, startPosition: null, endPosition: null });
     } else {
-      setTextContent(cur => [
-        ...cur.slice(0, cursor.position), newChar, ...cur.slice(cursor.position)
+      setTextContent(tc => [
+        ...tc.slice(0, cursor.position), newChar, ...tc.slice(cursor.position)
       ]);
-      setCursor(cur => ({ ...cur, position: cur.position + 1 }));
+      setCursor(c => ({ ...c, position: c.position + 1 }));
     }
-  }, [cursor, selection]);
-
-  const deleteCharacter = useCallback(() => {
+  };
+  
+  /* ---------- Delete ---------- */
+  const deleteCharacter = () => {
     if (selection.active && selection.startPosition !== null) {
-      const start = Math.min(selection.startPosition, selection.endPosition);
-      const end   = Math.max(selection.startPosition, selection.endPosition);
-      setTextContent(cur => [...cur.slice(0, start), ...cur.slice(end)]);
-      setCursor(cur => ({ ...cur, position: start }));
-      setSelection({ active:false, startPosition:null, endPosition:null });
+      const s = Math.min(selection.startPosition, selection.endPosition);
+      const e = Math.max(selection.startPosition, selection.endPosition);
+      setTextContent(tc => [...tc.slice(0, s), ...tc.slice(e)]);
+      setCursor(c => ({ ...c, position: s }));
+      setSelection({ active: false, startPosition: null, endPosition: null });
     } else if (cursor.position > 0) {
-      setTextContent(cur => [
-        ...cur.slice(0, cursor.position - 1), ...cur.slice(cursor.position)
+      setTextContent(tc => [
+        ...tc.slice(0, cursor.position - 1), ...tc.slice(cursor.position)
       ]);
-      setCursor(cur => ({ ...cur, position: cursor.position - 1 }));
+      setCursor(c => ({ ...c, position: cursor.position - 1 }));
     }
-  }, [cursor, selection]);
-
-  const moveCursorPosition = useCallback((dir) => {
+  };
+  
+  /* ---------- Move cursor ---------- */
+  const moveCursorPosition = (dir) => {
     const delta = dir === "left" ? -1 : 1;
     const len   = textContent.length;
-    const newPos = Math.max(0, Math.min(cursor.position + delta, len));
-
-    if (selection.active) {
-      if (selection.startPosition === null) {
-        setSelection({ active:true, startPosition:cursor.position, endPosition:newPos });
-      } else {
-        setSelection(curSel => ({ ...curSel, endPosition:newPos }));
-      }
-    } else {
-      setSelection({ active:false, startPosition:null, endPosition:null });
-    }
-    setCursor(cur => ({ ...cur, position:newPos }));
-  }, [cursor, textContent, selection]);
-
-  /* ───── Render ───── */
+    const pos   = Math.max(0, Math.min(cursor.position + delta, len));
+    setCursor(c => ({ ...c, position: pos }));
+  };
+  /* 6️⃣  Render */
   return (
     <div className="flex flex-col h-screen p-4 gap-4 bg-gray-50">
-      <Preview text={textContent.map(c => c.char).join("")} />
 
-      <StyleBar 
+      {/* Tabs */}
+      <div style={{display:"flex",gap:"4px",borderBottom:"1px solid #ccc"}}>
+        {docs.map(doc=>(
+          <button key={doc.id}
+            style={{padding:"4px 8px",
+              background:doc.id===activeId?"#ddd":"#f6f6f6"}}
+            onClick={()=>setActiveId(doc.id)}>
+            {doc.title}
+            <span style={{marginLeft:4,cursor:"pointer"}}
+              onClick={e=>{
+                e.stopPropagation();
+                setDocs(ds=>ds.filter(d=>d.id!==doc.id));
+                if(activeId===doc.id) setActiveId(ds[0]?.id || null);
+              }}>×</span>
+          </button>
+        ))}
+        <button onClick={()=>{
+          const id = Date.now();
+          setDocs(ds=>[...ds,{id,title:`Doc ${ds.length+1}`,content:[]}]);
+          setActiveId(id);
+        }}>＋</button>
+      </div>
+
+      <Preview text={textContent.map(c=>c.char).join("")} />
+
+      <StyleBar
         currentStyle={cursor.style}
-        onStyleChange={changeStyle}
         toggleStyle={toggleStyle}
+        onStyleChange={changeStyle}
       />
 
       <Editor text={getTextWithCursor()} />
 
       <FileManager
-        text={textContent.map(c => c.char).join("")}
-        setText={(txt) =>
-          setTextContent(txt.split("").map(ch => ({ char: ch, ...cursor.style })))
-        }
+        text={textContent.map(c=>c.char).join("")}
+        setText={txt=>{
+          const arr = (typeof txt === "string")
+            ? txt.split("").map(ch=>({char:ch,...cursor.style}))
+            : txt;
+          setTextContent(arr);
+        }}
+        fileMeta={fileMeta}
+        setFileMeta={setFileMeta}
       />
 
       <Keyboard

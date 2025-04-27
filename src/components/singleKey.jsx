@@ -21,7 +21,7 @@ const KeyButton = ({ char, onClick, altText }) => {
         backgroundColor: "#f4f4f4",
         transition: "background-color 0.2s",
       }}
-      title={altText}
+      title={altText || char}
     >
       {altText || char}
     </button>
