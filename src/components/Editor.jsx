@@ -41,7 +41,7 @@ const Editor = ({ text = [] }) => {
             key = {`line-${lineIndex}`}
             className = "text-line"
             style = {{
-              direction: rtl ? 'rtl' : ltr,
+              direction: rtl ? 'rtl' : 'ltr',
               textAlign: rtl ? 'right' : 'left',
               display: 'block',
               width: '100%'
@@ -50,7 +50,7 @@ const Editor = ({ text = [] }) => {
             {line.map((charObj, charIndex) => (
               <CustomLetter
                 key = {`char-${lineIndex}-${charIndex}`}
-                charData = {charObj}
+                charObj = {charObj}
               />
             ))}
           </div>
