@@ -3,7 +3,7 @@ import Key from "./singleKey";
 import { layouts } from "./KeyboardLanguages"
 import "../App.css";
 
-export default function Keyboard ({ keyPressd, backPressd, arrowPressd}) {
+export default function Keyboard ({ keyPressed, backPressed, arrowPressed}) {
   const [language, setLanguage] = useState("lowEnglish");
   const languageOrder = ["lowEnglish", "upEnglish", "hebrew", "emojies"];
 
@@ -15,12 +15,12 @@ export default function Keyboard ({ keyPressd, backPressd, arrowPressd}) {
   };
 
   const layout = layouts[language];
-  const rows = [
-    layout.numbers,
-    layout.letters1,
-    layout.letters2,
-    layout.letters3,
-  ];
+  // const rows = [
+  //   layout.numbers,
+  //   layout.letters1,
+  //   layout.letters2,
+  //   layout.letters3,
+  // ];
   const special = layout.special;
 
   return (
@@ -30,34 +30,34 @@ export default function Keyboard ({ keyPressd, backPressd, arrowPressd}) {
         {/* first row */}
         <div className="row">
           {layout.numbers.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressd} />
+            <Key key={i} char={key} onClick={keyPressed} />
           ))}
-          <Key char="delete" altText={special.delete} onClick={backPressd} />
+          <Key char="delete" altText={special.delete} onClick={backPressed} />
         </div>
 
 
         {/* second row */}
         <div className="row">
           {layout.letters1.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressd} />
+            <Key key={i} char={key} onClick={keyPressed} />
           ))}
-          <Key char="language"  altText={special.language} onClick={switchLanguage()} />
+          <Key char="language"  altText={special.language} onClick={switchLanguage} />
         </div>
 
 
         {/* third row */}
         <div className="row">
           {layout.letters2.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressd} />
+            <Key key={i} char={key} onClick={keyPressed} />
           ))}
-          <Key char="enter" altText={special.enter} wide onClick={() => keyPressd("\n")} />
+          <Key char="enter" altText={special.enter} wide onClick={() => keyPressed("\n")} />
         </div>
 
         {/* fourth row */}
         <div className="row">
           <Key char="shift" altText={special.shift} wide onClick={() => {}} />
           {layout.letters3.map((key, i) => (
-            <Key key={i} char={key} onClick={keyPressd} />
+            <Key key={i} char={key} onClick={keyPressed} />
           ))}
           <Key char="shift" altText={special.shift} wide onClick={() => {}} />
         </div>
@@ -66,11 +66,11 @@ export default function Keyboard ({ keyPressd, backPressd, arrowPressd}) {
         <div className="row">
           <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
-          <Key char="space" altText={special.space} wide onClick={() => keyPressd(" ")} />
+          <Key char="space" altText={special.space} wide onClick={() => keyPressed(" ")} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
           <Key char="ctrl" altText={special.ctrl} onClick={() => {}} />
-          <Key char="left" altText={special.left} onClick={() => arrowPressd("left")} />
-          <Key char="right" altText={special.right} onClick={() => arrowPressd("right")} />
+          <Key char="left" altText={special.left} onClick={() => arrowPressed("left")} />
+          <Key char="right" altText={special.right} onClick={() => arrowPressed("right")} />
         </div>
 
       </div>
