@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from "react";
 import Preview  from "./Preview";
 import FileManager from "./FileManager";
-import Keyboard from "./Keyboard";
-import Editor from "./Editor";	
+import Keyboard from "./keyboard";
+import Editor from "./Editor";
+import StyleBar from "./StyleBar";
 /* ---------- Component ---------- */
 export default function RichEditorScreen() {
   /* text – מערך אובייקטים {char, font, size, …} */
@@ -32,6 +33,45 @@ export default function RichEditorScreen() {
       ...textContent.slice(cursor.position)
     ];
   }, [textContent, cursor]);
+
+  /* Turning on and off style (bold, underline) */
+  const toggleStyle = useCallback((styleProperty) => {
+    setCursor(current => ({
+      ...current,
+      style: {
+        ...current.style,
+        [styleProperty]: !current.style[styleProperty]
+      }
+    }));
+  }, []);
+
+  const changeStyle = useCallback((propety, value) => {
+    setCursor(current => ({
+      ...current,
+      style: {
+        ...current.style,
+        [propety]: value
+      }
+    }));
+
+    if (selection.active && selection.startPosition !== null && selection.endPosition !== null) {
+      const start = Math.min(selection.startPosition, selection.endPosition);
+      const end = Math.max(selection.startPosition, selection.endPosition);
+      
+      setTextContent(current => {
+        const newText = [...current];
+        for (let i = start; i < end; i++) {
+          if (i < newText.length) {
+            newText[i] = {
+              ...newText[i],
+              [property]: value
+            };
+          }
+        }
+        return newText;
+      });
+    } 
+  }, [selection]);
 
   /* ───── Editing actions (insert / delete / move) ───── */
   const insertCharacter = useCallback((char) => {
@@ -91,6 +131,12 @@ export default function RichEditorScreen() {
     <div className="flex flex-col h-screen p-4 gap-4 bg-gray-50">
       <Preview text={textContent.map(c => c.char).join("")} />
 
+      <StyleBar 
+        currentStyle={cursor.style}
+        onStyleChange={changeStyle}
+        toggleStyle={toggleStyle}
+      />
+
       <Editor text={getTextWithCursor()} />
 
       <FileManager
@@ -104,7 +150,7 @@ export default function RichEditorScreen() {
         keyPressed={insertCharacter}
         backPressed={deleteCharacter}
         arrowPressed={moveCursorPosition}
-        selecting={selection}
+        selecting={selection.active}
         setSelection={setSelection}
       />
     </div>

@@ -23,7 +23,7 @@ const KeyButton = ({ char, onClick, altText }) => {
       }}
       title={altText}
     >
-      {char}
+      {altText || char}
     </button>
   );
 };
