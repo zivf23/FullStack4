@@ -1,9 +1,14 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState, useEffect  } from "react";
 import Preview from "./Preview";
+import useHistory from "../hooks/useHistory";
 import FileManager from "./FileManager";
 import Keyboard from "./Keyboard";
+import FindReplaceDialog from "./FindReplaceDialog";
+
 import Editor from "./Editor";
 import StyleBar from "./StyleBar";
+
+
 
 /* ───────── קומפוננטה ───────── */
 export default function RichEditorScreen() {
@@ -15,12 +20,24 @@ export default function RichEditorScreen() {
   const [activeId, setActiveId] = useState(1);
   const activeDoc   = docs.find(d => d.id === activeId) || docs[0];
   const textContent = Array.isArray(activeDoc.content) ? activeDoc.content : []; */
-  const [textContent, setTextContent] = useState([]);
+  // 
+  
+  const {
+    value: textContent,
+    set:   setTextContent,   // כמו useState-set אך שומר בהיסטוריה
+    undo,
+    redo,
+    canUndo,
+    canRedo
+  } = useHistory([]);        // [] = מצב התחלתי ריק
+  
 
   /* 2️⃣  File-name לטובת FileManager */
   const [filename, setFilename] = useState(null);
 
+  const [showFind, setShowFind] = useState(false);
 
+const plainText = Array.isArray(textContent) ? textContent.map(c => c.char).join("") : "";
 
   /* 3️⃣  Cursor + Selection */
   const [cursor, setCursor] = useState({
@@ -162,35 +179,46 @@ export default function RichEditorScreen() {
       const start = Math.min(selection.startPosition, selection.endPosition);
       const end = Math.max(selection.startPosition, selection.endPosition);
 
-      setTextContent(cur => [...cur.slice(0, start), newChar, ...cur.slice(end)]);
-      setCursor(cur => ({ ...cur, position: start + 1 }));
-      setSelection({ active: false, startPosition: null, endPosition: null });
+      
+      const next = [
+        ...textContent.slice(0, start), newChar, ...textContent.slice(end)
+      ];
+      setTextContent(next);
+      setCursor(c => ({ ...c, position: start + 1 }));
+      setSelection({ active:false, startPosition:null, endPosition:null });
+    } else {
+      const next = [
+        ...textContent.slice(0, cursor.position),
+        newChar,
+        ...textContent.slice(cursor.position)
+      ];
+      setTextContent(next);
+      setCursor(c => ({ ...c, position: c.position + 1 }));
     }
-    else {
-      setTextContent(cur => [
-        ...cur.slice(0, cursor.position), newChar, ...cur.slice(cursor.position)
-      ]);
-      setCursor(cur => ({ ...cur, position: cur.position + 1 }));
-    }
-  }, [cursor, selection]);
+  }, [cursor, selection, textContent, setTextContent]);
   
   /* ---------- Delete ---------- */
-  const deleteCharacter = useCallback (() => {
+  const deleteCharacter = useCallback(() => {
     if (selection.active && selection.startPosition !== null) {
       const start = Math.min(selection.startPosition, selection.endPosition);
       const end   = Math.max(selection.startPosition, selection.endPosition);
-
-      setTextContent(cur => [...cur.slice(0, start), ...cur.slice(end)]);
-      setCursor(cur => ({ ...cur, position: start }));
-      setSelection({ active:false, startPosition:null, endPosition:null });
+  
+      const next = [
+        ...textContent.slice(0, start),
+        ...textContent.slice(end)
+      ];
+      setTextContent(next);
+      setCursor(c => ({ ...c, position: start }));
     }
-    else if (cursor.position > 0) {
-      setTextContent(cur => [
-        ...cur.slice(0, cursor.position - 1), ...cur.slice(cursor.position)
-      ]);
-      setCursor(cur => ({ ...cur, position: cur.position - 1 }));
+    else if (cursor.position > 0) {             // מחיקה “רגילה”
+      const next = [
+        ...textContent.slice(0, cursor.position - 1),
+        ...textContent.slice(cursor.position)
+      ];
+      setTextContent(next);
+      setCursor(c => ({ ...c, position: c.position - 1 }));
     }
-  }, [cursor, selection]);
+  }, [textContent, cursor, selection, setTextContent]);
 
   const deleteWord = useCallback(() => {
     // case of selecting on
@@ -242,7 +270,7 @@ export default function RichEditorScreen() {
       setSelection({ active: false, startPosition: null, endPosition: null });
     }
 
-  }, []);
+  }, [setTextContent]);
 
   /* Move the cursor */
   const moveCursorPosition = useCallback((dir) => {
@@ -297,9 +325,11 @@ export default function RichEditorScreen() {
 
 
   // files
-  const handleSetText = (text) => {
-    setTextContent(text.split("").map(ch => ({char: ch, ...cursor.style})));
-  }
+  const handleSetText = useCallback((plainStr) => {
+    const next = plainStr.split("").map(ch => ({ char: ch, style:{} }));
+    setTextContent(next);
+    setCursor(c => ({ ...c, position: next.length }));
+  }, [setTextContent]);
 
 /*   const handleSetText = (text) => {
     if (typeof text === 'string') {
@@ -354,7 +384,22 @@ export default function RichEditorScreen() {
         setText={handleFilesData}
         filename={filename}
         setFilename={setFilename}
+        undo={undo}
+        redo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        
       />
+
+      <button className="btn" onClick={() => setShowFind(true)}>Find / Replace</button>
+      <FindReplaceDialog
+        open={showFind}
+        onClose={() => setShowFind(false)}
+        text={plainText}                    // הפוך את textContent למחרוזת
+        setText={str => handleSetText(str)} // ממיר חזרה למבנה-תוים
+        
+/>
+
 
       <Keyboard
         keyPressed={insertCharacter}
@@ -365,5 +410,8 @@ export default function RichEditorScreen() {
         toggleSelection={toggleSelectionMode}
       />
     </div>
+
+    
   );
+
 }

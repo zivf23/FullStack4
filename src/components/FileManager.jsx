@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { listFiles, saveFile, loadFile, deleteFile } from "../storage";
 
-export default function FileManager({ text, setText, filename, setFilename }) {
+export default function FileManager({ text, setText, filename, setFilename, undo, redo, canUndo, canRedo }) {
   /* fileMeta   = { name: "doc.txt", id: 123 } */
   const { user, logout } = useAuth();
   const [showList, setShowList] = useState(false);
@@ -71,6 +71,8 @@ export default function FileManager({ text, setText, filename, setFilename }) {
     <div className="flex gap-2 items-center">
       <button className="btn" onClick={handleNew}>📝 New</button>
       <button className="btn" onClick={handleSave}>💾 Save</button>
+      <button className="btn" onClick={undo} disabled={!canUndo} title="Ctrl + Z">Undo</button>
+      <button className="btn" onClick={redo} disabled={!canRedo} title="Ctrl + Y">Redo</button>
       <button className="btn" onClick={handleSaveAs}>📁 Save As</button>
       <button className="btn" onClick={() => setShowList(v => !v)}>📂 Open…</button>
       <span className="ml-auto italic text-sm">
