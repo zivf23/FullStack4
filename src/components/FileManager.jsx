@@ -2,17 +2,23 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { listFiles, saveFile, loadFile, deleteFile } from "../storage";
 
-export default function FileManager({ text, setText, filename, setFilename }) {
+export default function FileManager({ text, setText, filename, setFilename, selectionActive }) {
   /* fileMeta   = { name: "doc.txt", id: 123 } */
   const { user, logout } = useAuth();
   const [showList, setShowList] = useState(false);
 
   /* ——— New ——— */
   const handleNew = () => {
-    if (text.length && !window.confirm("Discard current text?")) return;
-    setText("");
-    setFilename(null);
-    setShowList(false);
+    if (text && text.length > 0) {
+      if (window.confirm("Create a new document? unsaves changes will be lost.")) {
+        setText("");
+        setFilename(null);
+      }
+    }
+    else {
+      setText("");
+      setFilename(null);
+    }
   };
 
   /* ——— Save / Save As ——— */
@@ -68,15 +74,34 @@ export default function FileManager({ text, setText, filename, setFilename }) {
   };
 
   return (
-    <div className="flex gap-2 items-center">
-      <button className="btn" onClick={handleNew}>📝 New</button>
-      <button className="btn" onClick={handleSave}>💾 Save</button>
-      <button className="btn" onClick={handleSaveAs}>📁 Save As</button>
-      <button className="btn" onClick={() => setShowList(v => !v)}>📂 Open…</button>
-      <span className="ml-auto italic text-sm">
-        {filename || "Unnamed"}
-      </span>
-      <button className="btn bg-red-600" onClick={logout}>Logout</button>
+    <div className="toolbar-container">
+      <div className="flex gap-2 items-center">
+        {/* Left side (New, Save, ...) */}
+        <div className="toolbar-left flex gap-2">
+          <button className="btn" onClick={handleNew}>📝 New</button>
+          <button className="btn" onClick={handleSave}>💾 Save</button>
+          <button className="btn" onClick={handleSaveAs}>📁 Save As</button>
+          <button className="btn" onClick={() => setShowList(v => !v)}>📂 Open…</button>
+        </div>
+
+        {/* Cetner */}
+        <div className="toolbar-center flex-grow text-center">
+          {selectionActive && (
+            <span className="selection-status font-medium text-blue-600">
+              Selection Mode Is Activated
+            </span>
+          )}
+        </div>
+
+        {/* Right side */}
+        <div className="toolbar-right flex gap-2 items-center">
+          <span className="ml-auto italic text-sm">
+            {filename || "Unnamed"}
+          </span>
+          <button className="btn bg-red-600" onClick={logout}>Logout</button>
+        </div>
+      </div>
+
 
       {showList && (
         <div className="modal-overlay" onClick={() => setShowList(false)}>
