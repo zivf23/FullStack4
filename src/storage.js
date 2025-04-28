@@ -6,6 +6,7 @@ export function getUserNamespace(user) {
   if (!store[user]) store[user] = {};
   return store;
 }
+
 export function saveUserNamespace(store) {
   localStorage.setItem("rted_users", JSON.stringify(store));
 }
@@ -21,11 +22,12 @@ export function saveFile(user, name, content) {
 }
 
 export function loadFile(user, name) {
-  return userData[user] && userData[user][name] ? userData[user][name] : "";
+  const store = getUserNamespace(user);
+  return store[user] && store[user][name] ? store[user][name] : "";
 }
 
 export function deleteFile(user, name) {
-  const userData = getUserNamespace(user);
+  const store = getUserNamespace(user);
 
   if (store[user] && store[user][name]) {
     delete store[user][name];

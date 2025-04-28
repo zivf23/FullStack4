@@ -1,50 +1,98 @@
 import React, { useState, useCallback } from "react";
-import Preview     from "./Preview";
+import Preview from "./Preview";
 import FileManager from "./FileManager";
-import Keyboard    from "./Keyboard";
-import Editor      from "./Editor";
-import StyleBar    from "./StyleBar";
+import Keyboard from "./Keyboard";
+import Editor from "./Editor";
+import StyleBar from "./StyleBar";
 
 /* ───────── קומפוננטה ───────── */
 export default function RichEditorScreen() {
 
   /* 1️⃣  Tabs */
-  const [docs, setDocs] = useState([
+/*   const [docs, setDocs] = useState([
     { id: 1, title: "Untitled 1", content: [] }
   ]);
   const [activeId, setActiveId] = useState(1);
   const activeDoc   = docs.find(d => d.id === activeId) || docs[0];
-  const textContent = Array.isArray(activeDoc.content) ? activeDoc.content : [];
+  const textContent = Array.isArray(activeDoc.content) ? activeDoc.content : []; */
+  const [textContent, setTextContent] = useState([]);
 
-  /* 2️⃣  File-meta לטובת FileManager */
-  const [fileMeta, setFileMeta] = useState({ name: null, id: null });
+  /* 2️⃣  File-name לטובת FileManager */
+  const [filename, setFilename] = useState(null);
+
+
 
   /* 3️⃣  Cursor + Selection */
   const [cursor, setCursor] = useState({
     position: 0,
-    style: { font: "Arial", size: "20px", color: "black",
-             bold: false, italic: false, underline: false }
+    style: { font: "Arial", 
+      size: "20px", 
+      color: "black",
+      bold: false, 
+      italic: false, 
+      underline: false 
+    }
   });
+
   const [selection, setSelection] = useState({
     active:false, startPosition:null, endPosition:null
   });
 
   /* — helper: שמירה בטאב הפעיל — */
-  const setTextContent = (arr) =>
-    setDocs(ds => ds.map(d =>
-      d.id === activeId ? { ...d, content: arr } : d
-    ));
+  // const setTextContent = (arr) =>
+  //   setDocs(ds => ds.map(d =>
+  //     d.id === activeId ? { ...d, content: arr } : d
+  //   ));
 
   /* — helper: array + cursor — */
   const getTextWithCursor = useCallback(() => {
-    if (!textContent.length)
-      return [{ char:"|", ...cursor.style }];
+    // If selection is active, highlight selected text
+    if (selection.active && selection.startPosition !== null && selection.endPosition !== null) {
+      const start = Math.min(selection.startPosition, selection.endPosition);
+      const end = Math.max(selection.startPosition, selection.endPosition);
+      
+      const result = [];
+      
+      // The text before
+      if (start > 0) {
+        result.push(...textContent.slice(0, start));
+      }
+      
+      // Selected text with highlight
+      for (let i = start; i < end; i++) {
+        if (i < textContent.length) {
+          result.push({
+            ...textContent[i],
+            highlight: true // נוסיף את הסימון עצמו
+          });
+        }
+      }
+      
+      // The text after
+      if (end < textContent.length) {
+        result.push(...textContent.slice(end));
+      }
+      
+      // The actual cursor
+      const cursorPosition = cursor.position;
+      return [
+        ...result.slice(0, cursorPosition),
+        { char: "|", ...cursor.style },
+        ...result.slice(cursorPosition)
+      ];
+    }
+    
+    // Case of selection-mode off, just show the cursor
+    if (textContent.length === 0) {
+      return [{ char: "|", ...cursor.style }];
+    }
+
     return [
       ...textContent.slice(0, cursor.position),
-      { char:"|", ...cursor.style },
+      { char: "|", ...cursor.style },
       ...textContent.slice(cursor.position)
     ];
-  }, [textContent, cursor]);
+  }, [textContent, cursor, selection]);
 
   /* Turning on and off style (bold, underline) */
   const toggleStyle = useCallback((styleProperty) => {
@@ -66,14 +114,14 @@ export default function RichEditorScreen() {
           if (i < newText.length) {
             newText[i] = {
               ...newText[i],
-              [styleProperty]: !cursor.style[styleProperty]
+              [styleProperty]: !newText[i][styleProperty]
             };
           }
         }
         return newText;
       });
     }
-  }, [selection, cursor.style]);
+  }, [selection]);
 
 
   const changeStyle = useCallback((property, value) => {
@@ -85,6 +133,8 @@ export default function RichEditorScreen() {
       }
     }));
 
+    // עכשיו כשאני חושב על זה בכל פונקציה במקום לבדוק אם מצב "בחירה" דולק
+    // אם יהיה זמן לנסות לעשות פונקציה אחת שפשוט נקרא לה בכל פעם
     if (selection.active && selection.startPosition !== null && selection.endPosition !== null) {
       const start = Math.min(selection.startPosition, selection.endPosition);
       const end = Math.max(selection.startPosition, selection.endPosition);
@@ -107,26 +157,25 @@ export default function RichEditorScreen() {
   /* ───── Editing actions (insert / delete / move) ───── */
   const insertCharacter = useCallback((char) => {
     const newChar = { char, ...cursor.style };
-
-  const insertCharacter = (ch) => {
-    const newChar = { char: ch, ...cursor.style };
   
     if (selection.active && selection.startPosition !== null) {
-      const s = Math.min(selection.startPosition, selection.endPosition);
-      const e = Math.max(selection.startPosition, selection.endPosition);
-      setTextContent(tc => [...tc.slice(0, s), newChar, ...tc.slice(e)]);
-      setCursor(c => ({ ...c, position: s + 1 }));
+      const start = Math.min(selection.startPosition, selection.endPosition);
+      const end = Math.max(selection.startPosition, selection.endPosition);
+
+      setTextContent(cur => [...cur.slice(0, start), newChar, ...cur.slice(end)]);
+      setCursor(cur => ({ ...cur, position: start + 1 }));
       setSelection({ active: false, startPosition: null, endPosition: null });
-    } else {
-      setTextContent(tc => [
-        ...tc.slice(0, cursor.position), newChar, ...tc.slice(cursor.position)
-      ]);
-      setCursor(c => ({ ...c, position: c.position + 1 }));
     }
-  };
+    else {
+      setTextContent(cur => [
+        ...cur.slice(0, cursor.position), newChar, ...cur.slice(cursor.position)
+      ]);
+      setCursor(cur => ({ ...cur, position: cur.position + 1 }));
+    }
+  }, [cursor, selection]);
   
   /* ---------- Delete ---------- */
-  const deleteCharacter = () => {
+  const deleteCharacter = useCallback (() => {
     if (selection.active && selection.startPosition !== null) {
       const start = Math.min(selection.startPosition, selection.endPosition);
       const end   = Math.max(selection.startPosition, selection.endPosition);
@@ -134,11 +183,12 @@ export default function RichEditorScreen() {
       setTextContent(cur => [...cur.slice(0, start), ...cur.slice(end)]);
       setCursor(cur => ({ ...cur, position: start }));
       setSelection({ active:false, startPosition:null, endPosition:null });
-    } else if (cursor.position > 0) {
-      setTextContent(tc => [
-        ...tc.slice(0, cursor.position - 1), ...tc.slice(cursor.position)
+    }
+    else if (cursor.position > 0) {
+      setTextContent(cur => [
+        ...cur.slice(0, cursor.position - 1), ...cur.slice(cursor.position)
       ]);
-      setCursor(c => ({ ...c, position: cursor.position - 1 }));
+      setCursor(cur => ({ ...cur, position: cur.position - 1 }));
     }
   }, [cursor, selection]);
 
@@ -154,11 +204,27 @@ export default function RichEditorScreen() {
     }
     else if (cursor.position > 0) {
       let wordStart = cursor.position;
+      let foundWord = false;
       
       // Move backward until we find a space or start of line
-      while (wordStart > 0 && textContent[wordStart - 1].char !== ' ' && textContent[wordStart - 1].char !== '\n') {
-        wordStart--;
+      if (wordStart < textContent.length && textContent[wordStart].char === ' ') {
+        while (wordStart > 0 && textContent[wordStart - 1].char !== ' ') {
+          wordStart--;
+        }
       }
+      else {
+        while (wordStart > 0) {
+          if (textContent[wordStart - 1].char === ' ' && foundWord) {
+            break;
+          }
+
+          if (textContent[wordStart - 1].char !== ' ') {
+            foundWord = true;
+          }
+          wordStart--;
+        }
+      }
+
       
       // Delete from the start of the word till the cursor position
       setTextContent(cur => [
@@ -168,12 +234,17 @@ export default function RichEditorScreen() {
     }
   }, [cursor, selection, textContent]);
 
+  /* Clear All */
   const clearAll = useCallback(() => {
-    setTextContent([]);
-    setCursor(cur => ({ ...cur, position: 0 }));
-    setSelection({ active: false, startPosition: null, endPosition: null });
+    if (window.confirm("Are you sure that u wanna clear all the text?")) {
+      setTextContent([]);
+      setCursor(cur => ({ ...cur, position: 0 }));
+      setSelection({ active: false, startPosition: null, endPosition: null });
+    }
+
   }, []);
 
+  /* Move the cursor */
   const moveCursorPosition = useCallback((dir) => {
     const delta = dir === "left" ? -1 : 1;
     const len   = textContent.length;
@@ -182,29 +253,59 @@ export default function RichEditorScreen() {
     if (selection.active) {
       if (selection.startPosition === null) {
         setSelection({ active:true, startPosition:cursor.position, endPosition:newPos });
-      } else {
+      }
+      else {
         setSelection(curSel => ({ ...curSel, endPosition:newPos }));
       }
-    } else {
+    }
+    else {
       setSelection({ active:false, startPosition:null, endPosition:null });
     }
-    setCursor(cur => ({ ...cur, position:newPos }));
+
+    setCursor(cur => ({ 
+      ...cur, 
+      position:newPos 
+    }));
+
   }, [cursor, textContent, selection]);
 
 
 
-  // files
-  const toggleSelectionMode = useCallback((isActive) => {
-    setSelection({
-      active: isActive,
-      startPosition: isActive ? cursor.position : null,
-      endPosition: isActive ? cursor.position :null
+  const toggleSelectionMode = useCallback(() => {
+    setSelection(current => {
+      if (current.active) {
+        return{
+          active: false,
+          startPosition: null,
+          endPosition: null
+        };
+      }
+      else {
+        return {
+          active: true,
+          startPosition: cursor.position,
+          endPosition: cursor.position
+        };
+      }
+      // active: isActive,
+      // startPosition: isActive ? cursor.position : null,
+      // endPosition: isActive ? cursor.position :null
     });
   }, [cursor.position]);
 
-  const handleSetFile = (text) => {
+
+
+
+  // files
+  const handleSetText = (text) => {
     setTextContent(text.split("").map(ch => ({char: ch, ...cursor.style})));
   }
+
+/*   const handleSetText = (text) => {
+    if (typeof text === 'string') {
+      setTextContent(text.split("").map(ch => ({char: ch, ... cursor.style })));
+    }
+  }; */
 
   const handleFilesData = (fileData) => {
     // Try to parse as JSON (formatted text)
@@ -232,28 +333,6 @@ export default function RichEditorScreen() {
   return (
     <div className="flex flex-col h-screen p-4 gap-4 bg-gray-50">
 
-      {/* Tabs */}
-      <div style={{display:"flex",gap:"4px",borderBottom:"1px solid #ccc"}}>
-        {docs.map(doc=>(
-          <button key={doc.id}
-            style={{padding:"4px 8px",
-              background:doc.id===activeId?"#ddd":"#f6f6f6"}}
-            onClick={()=>setActiveId(doc.id)}>
-            {doc.title}
-            <span style={{marginLeft:4,cursor:"pointer"}}
-              onClick={e=>{
-                e.stopPropagation();
-                setDocs(ds=>ds.filter(d=>d.id!==doc.id));
-                if(activeId===doc.id) setActiveId(ds[0]?.id || null);
-              }}>×</span>
-          </button>
-        ))}
-        <button onClick={()=>{
-          const id = Date.now();
-          setDocs(ds=>[...ds,{id,title:`Doc ${ds.length+1}`,content:[]}]);
-          setActiveId(id);
-        }}>＋</button>
-      </div>
 
       <Preview text={textContent.map(c=>c.char).join("")} />
 
@@ -263,7 +342,12 @@ export default function RichEditorScreen() {
         onStyleChange={changeStyle}
       />
 
-      <Editor text={getTextWithCursor()} />
+      <div className="editor-rapper">
+        <Editor text={getTextWithCursor()} />
+        <div className="selection-status">
+          {selection.active ? "Selection Mode Is Activeted" : ""}
+        </div>
+      </div>
 
       <FileManager
         text={getFileData()}
@@ -278,6 +362,7 @@ export default function RichEditorScreen() {
         arrowPressed={moveCursorPosition}
         deleteWord={deleteWord}
         clearAll={clearAll}
+        toggleSelection={toggleSelectionMode}
       />
     </div>
   );

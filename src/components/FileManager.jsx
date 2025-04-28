@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { listFiles, saveFile, loadFile, deleteFile } from "../storage";
 
-export default function FileManager({ text, setText, fileMeta, setFilename }) {
+export default function FileManager({ text, setText, filename, setFilename }) {
   /* fileMeta   = { name: "doc.txt", id: 123 } */
   const { user, logout } = useAuth();
   const [showList, setShowList] = useState(false);
@@ -11,19 +11,14 @@ export default function FileManager({ text, setText, fileMeta, setFilename }) {
   const handleNew = () => {
     if (text.length && !window.confirm("Discard current text?")) return;
     setText("");
-    setFileMeta({ name: null, id: null });
+    setFilename(null);
     setShowList(false);
   };
 
   /* ——— Save / Save As ——— */
-  const doSave = (name) => {
-    if (!name) return;
-    saveFile(user, name, text);
-    setFileMeta({ name, id: Date.now() });
-  };
-
   const handleSave = () => {
-    const name = filename || prompt("Enter file name:", filename || "untitled.txt");
+    const name = fileMeta.name || prompt("Enter file name: ", fileMeta || "untitled.txt");
+
     if (name) {
       saveFile(user, name, text);
       setFilename(name);
@@ -31,14 +26,14 @@ export default function FileManager({ text, setText, fileMeta, setFilename }) {
   };
 
   const handleSaveAs = () => {
-    const name = prompt("Save as:", "untitled.txt");
+    const name = prompt("Save as: ", "untitled.txt");
     if (name) {
       saveFile(user, name, text);
       setFilename(name);
     }
   };
 
-  const handleNew = () => {
+/*   const handleNew = () => {
     if (text && text.length > 0) {
       if (window.confirm("Create new document? Any unsaved changes will be lost.")) {
         setText("");
@@ -48,16 +43,13 @@ export default function FileManager({ text, setText, fileMeta, setFilename }) {
       setText("");
       setFilename(null);
     }
-  };
+  }; */
 
   /* ——— Open ——— */
   const handleOpen = (name) => {
     const fileContent = loadFile(user, name);
     setText(fileContent);
     setFilename(name);
-    const content = loadFile(user, name);
-    setText(content);
-    setFilename({ name, id: Date.now() });
     setShowList(false);
   };
 
@@ -82,7 +74,7 @@ export default function FileManager({ text, setText, fileMeta, setFilename }) {
       <button className="btn" onClick={handleSaveAs}>📁 Save As</button>
       <button className="btn" onClick={() => setShowList(v => !v)}>📂 Open…</button>
       <span className="ml-auto italic text-sm">
-        {fileMeta.name || "Unnamed"}
+        {filename || "Unnamed"}
       </span>
       <button className="btn bg-red-600" onClick={logout}>Logout</button>
 
@@ -99,7 +91,7 @@ export default function FileManager({ text, setText, fileMeta, setFilename }) {
                     className="delete-btn text-red-600 hover:text-red-800"
                     title="Delete file"
                   >
-                    🗑
+                    {/* 🗑 */}X
                   </button>
                 </li>
               ))}

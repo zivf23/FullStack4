@@ -68,7 +68,7 @@ export default function Keyboard ({ keyPressed, backPressed, arrowPressed, delet
         <div className="row">
           <Key char="ctrl" altText={special.ctrl} wide onClick={() => {}} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
-          <Key char="space" altText={"space"} wide onClick={() => keyPressed(" ")} />
+          <Key char="space" altText={special.space} wide onClick={() => keyPressed(" ")} />
           <Key char="alt" altText={special.alt} onClick={() => {}} />
           <Key char="ctrl" altText={special.ctrl} wide onClick={() => {}} />
           <Key char="left" altText={special.left} onClick={() => arrowPressed("left")} />
