@@ -55,6 +55,27 @@ const plainText = Array.isArray(textContent) ? textContent.map(c => c.char).join
     active:false, startPosition:null, endPosition:null
   });
 
+  // i changed the preview to show only the current line
+  // changed also the preview to not be at the top
+  const getCurrentLine = useCallback (() => {
+    if (textContent.length === 0) {
+      return "";
+    }
+
+    let lineStart = cursor.position;
+    let lineEnd = cursor.position;
+
+    while (lineStart > 0 && textContent[lineStart - 1].char !== '\n') {
+      lineEnd--;
+    }
+
+    while (lineEnd < textContent.length && textContent[lineEnd].char !== '\n') {
+      lineEnd++;
+    }
+
+    return textContent.slice(lineStart, lineEnd).map(c => c.char).join("");
+  }, [textContent, cursor]);
+
   /* — helper: שמירה בטאב הפעיל — */
   // const setTextContent = (arr) =>
   //   setDocs(ds => ds.map(d =>
@@ -364,7 +385,6 @@ const plainText = Array.isArray(textContent) ? textContent.map(c => c.char).join
     <div className="flex flex-col h-screen p-4 gap-4 bg-gray-50">
 
 
-      <Preview text={textContent.map(c=>c.char).join("")} />
 
       <StyleBar
         currentStyle={cursor.style}
@@ -374,9 +394,9 @@ const plainText = Array.isArray(textContent) ? textContent.map(c => c.char).join
 
       <div className="editor-rapper">
         <Editor text={getTextWithCursor()} />
-        <div className="selection-status">
+{/*         <div className="selection-status">
           {selection.active ? "Selection Mode Is Activeted" : ""}
-        </div>
+        </div> */}
       </div>
 
       <FileManager

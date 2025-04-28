@@ -9,10 +9,16 @@ export default function FileManager({ text, setText, filename, setFilename, undo
 
   /* ——— New ——— */
   const handleNew = () => {
-    if (text.length && !window.confirm("Discard current text?")) return;
-    setText("");
-    setFilename(null);
-    setShowList(false);
+    if (text && text.length > 0) {
+      if (window.confirm("Create a new document? unsaves changes will be lost.")) {
+        setText("");
+        setFilename(null);
+      }
+    }
+    else {
+      setText("");
+      setFilename(null);
+    }
   };
 
   /* ——— Save / Save As ——— */
